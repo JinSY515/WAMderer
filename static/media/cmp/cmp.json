@@ -1,0 +1,37 @@
+[
+ {
+  "id": "01",
+  "baseline": "Aether",
+  "dom": "Synthetic"
+ },
+ {
+  "id": "02",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Synthetic"
+ },
+ {
+  "id": "03",
+  "baseline": "NoMaD + LingBot-World",
+  "dom": "Synthetic"
+ },
+ {
+  "id": "04",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Synthetic"
+ },
+ {
+  "id": "05",
+  "baseline": "Aether",
+  "dom": "Real"
+ },
+ {
+  "id": "06",
+  "baseline": "NoMaD + NWM",
+  "dom": "Real"
+ },
+ {
+  "id": "07",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Real"
+ }
+]

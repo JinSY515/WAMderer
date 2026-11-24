@@ -1,0 +1,418 @@
+{
+ "cmp": [
+  {
+   "key": "GT",
+   "name": "Ground truth",
+   "group": null
+  },
+  {
+   "key": "OURS",
+   "name": "WAMderer (Ours)",
+   "group": null
+  },
+  {
+   "key": "aether_planning",
+   "name": "Aether",
+   "group": "Joint"
+  },
+  {
+   "key": "nwm_nomad",
+   "name": "NoMaD + NWM",
+   "group": "Plan-then-generate"
+  },
+  {
+   "key": "nomad_deepverse",
+   "name": "NoMaD + DeepVerse",
+   "group": "Plan-then-generate"
+  },
+  {
+   "key": "nomad_lingbot_oneshot",
+   "name": "NoMaD + LingBot-World",
+   "group": "Plan-then-generate"
+  },
+  {
+   "key": "nomad_egowm",
+   "name": "NoMaD + EgoWM",
+   "group": "Plan-then-generate"
+  },
+  {
+   "key": "vggtomega_seva",
+   "name": "VGGT-Ω + SEVA",
+   "group": "Pose-then-generate"
+  },
+  {
+   "key": "vggtomega_vggtdiff",
+   "name": "VGGT-Ω + VGGT-Diff",
+   "group": "Pose-then-generate"
+  },
+  {
+   "key": "wan21_flf2v",
+   "name": "Wan2.1-FLF2V",
+   "group": "Video only"
+  },
+  {
+   "key": "wan21_vace",
+   "name": "Wan2.1-VACE",
+   "group": "Video only"
+  },
+  {
+   "key": "wan22_fun_inp",
+   "name": "Wan2.2-Fun-InP",
+   "group": "Video only"
+  }
+ ],
+ "traversals": {
+  "syn": [
+   {
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "id": "syn04",
+    "n": 4
+   },
+   {
+    "id": "syn05",
+    "n": 5
+   },
+   {
+    "id": "syn06",
+    "n": 6
+   },
+   {
+    "id": "syn07",
+    "n": 7
+   },
+   {
+    "id": "syn08",
+    "n": 8
+   }
+  ],
+  "real": [
+   {
+    "id": "real01",
+    "n": 1
+   },
+   {
+    "id": "real02",
+    "n": 2
+   },
+   {
+    "id": "real03",
+    "n": 3
+   },
+   {
+    "id": "real04",
+    "n": 4
+   },
+   {
+    "id": "real05",
+    "n": 5
+   },
+   {
+    "id": "real06",
+    "n": 6
+   },
+   {
+    "id": "real07",
+    "n": 7
+   },
+   {
+    "id": "real08",
+    "n": 8
+   }
+  ]
+ },
+ "baselines": {
+  "syn": [
+   {
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "id": "syn04",
+    "n": 4
+   },
+   {
+    "id": "syn05",
+    "n": 5
+   }
+  ],
+  "real": [
+   {
+    "id": "real01",
+    "n": 1
+   },
+   {
+    "id": "real02",
+    "n": 2
+   },
+   {
+    "id": "real03",
+    "n": 3
+   },
+   {
+    "id": "real04",
+    "n": 4
+   },
+   {
+    "id": "real05",
+    "n": 5
+   }
+  ]
+ },
+ "coherence": {
+  "syn": [
+   {
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "id": "syn04",
+    "n": 4
+   }
+  ],
+  "real": [
+   {
+    "id": "real01",
+    "n": 1
+   },
+   {
+    "id": "real02",
+    "n": 2
+   },
+   {
+    "id": "real03",
+    "n": 3
+   },
+   {
+    "id": "real04",
+    "n": 4
+   }
+  ]
+ },
+ "goalstate": {
+  "syn": [
+   {
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "id": "syn04",
+    "n": 4
+   },
+   {
+    "id": "syn05",
+    "n": 5
+   }
+  ]
+ },
+ "goalswap": {
+  "syn": [
+   {
+    "variant": "spring",
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "variant": "golden hour",
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "variant": "autumn",
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "variant": "dawn",
+    "id": "syn04",
+    "n": 4
+   },
+   {
+    "variant": "autumn",
+    "id": "syn05",
+    "n": 5
+   }
+  ],
+  "real": [
+   {
+    "variant": "autumn",
+    "id": "real01",
+    "n": 1
+   },
+   {
+    "variant": "autumn",
+    "id": "real02",
+    "n": 2
+   },
+   {
+    "variant": "golden hour",
+    "id": "real03",
+    "n": 3
+   },
+   {
+    "variant": "dawn",
+    "id": "real04",
+    "n": 4
+   },
+   {
+    "variant": "spring",
+    "id": "real05",
+    "n": 5
+   }
+  ]
+ },
+ "camctl": {
+  "syn": [
+   {
+    "id": "syn01",
+    "n": 1
+   },
+   {
+    "id": "syn02",
+    "n": 2
+   },
+   {
+    "id": "syn03",
+    "n": 3
+   },
+   {
+    "id": "syn04",
+    "n": 4
+   },
+   {
+    "id": "syn05",
+    "n": 5
+   }
+  ],
+  "real": [
+   {
+    "id": "real01",
+    "n": 1
+   },
+   {
+    "id": "real02",
+    "n": 2
+   },
+   {
+    "id": "real03",
+    "n": 3
+   },
+   {
+    "id": "real04",
+    "n": 4
+   },
+   {
+    "id": "real05",
+    "n": 5
+   }
+  ]
+ },
+ "general": {
+  "dl3dv": [
+   {
+    "id": "dl3dv01",
+    "n": 1
+   },
+   {
+    "id": "dl3dv02",
+    "n": 2
+   },
+   {
+    "id": "dl3dv03",
+    "n": 3
+   },
+   {
+    "id": "dl3dv04",
+    "n": 4
+   },
+   {
+    "id": "dl3dv05",
+    "n": 5
+   }
+  ],
+  "recon": [
+   {
+    "id": "recon01",
+    "n": 1
+   },
+   {
+    "id": "recon02",
+    "n": 2
+   },
+   {
+    "id": "recon03",
+    "n": 3
+   },
+   {
+    "id": "recon04",
+    "n": 4
+   },
+   {
+    "id": "recon05",
+    "n": 5
+   }
+  ]
+ },
+ "rollouts": {
+  "all": [
+   {
+    "id": "all01",
+    "n": 1
+   },
+   {
+    "id": "all02",
+    "n": 2
+   },
+   {
+    "id": "all03",
+    "n": 3
+   },
+   {
+    "id": "all04",
+    "n": 4
+   },
+   {
+    "id": "all05",
+    "n": 5
+   },
+   {
+    "id": "all06",
+    "n": 6
+   }
+  ]
+ }
+}

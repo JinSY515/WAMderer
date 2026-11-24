@@ -1,0 +1,44 @@
+[
+ {
+  "id": "01",
+  "baseline": "Aether",
+  "dom": "Synthetic",
+  "video": true
+ },
+ {
+  "id": "02",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Synthetic",
+  "video": true
+ },
+ {
+  "id": "03",
+  "baseline": "NoMaD + LingBot-World",
+  "dom": "Synthetic",
+  "video": true
+ },
+ {
+  "id": "04",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Synthetic",
+  "video": true
+ },
+ {
+  "id": "05",
+  "baseline": "Aether",
+  "dom": "Real",
+  "video": true
+ },
+ {
+  "id": "06",
+  "baseline": "NoMaD + NWM",
+  "dom": "Real",
+  "video": true
+ },
+ {
+  "id": "07",
+  "baseline": "NoMaD + DeepVerse",
+  "dom": "Real",
+  "video": true
+ }
+]
