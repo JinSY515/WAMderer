@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WAMderer Explorer</title>
 <meta name="description" content="Explore WAMderer traversals: generated video, predicted depth and the predicted camera, lifted into 3D.">
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root { --ours:#7048c8; --ours-soft:#f0ebfb; --goal:#8e44ad; --ink:#222; --muted:#6b6b6b; --faint:#9a9a9a;
           --line:#e5e5e5; --bg:#ffffff; --panel:#fafafa; --dark:#121118; }
@@ -66,6 +66,49 @@
   .legend i { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-right:6px; }
   .note { font-size:.8rem; color:var(--faint); line-height:1.5; margin-top:10px; max-width:900px; }
   footer { text-align:center; color:var(--faint); font-size:.8rem; padding:20px 16px 30px; }
+
+  /* ---------- layout / alignment pass (matches the project page) ---------- */
+  :root { --paper:#fbfaff; --line:#e8e3f3; --muted:#5f5a6e; --ink:#17141f; }
+  body { font-family:'Inter','Google Sans',sans-serif; background:var(--paper); -webkit-font-smoothing:antialiased; }
+  header, main { max-width:1240px; padding-left:24px; padding-right:24px; }
+  header { padding-top:28px; padding-bottom:10px; }
+  h1 { font-size:clamp(1.6rem,2.6vw,2.15rem); font-weight:650; letter-spacing:-.025em; line-height:1.2; margin:.5rem 0 .5rem; text-wrap:balance; }
+  h1 .brand { background:linear-gradient(90deg,#7048c8,#c2477d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { max-width:none; font-size:1rem; line-height:1.6; text-wrap:pretty; }
+  main { grid-template-columns:250px minmax(0, 1fr); gap:28px; align-items:start; }
+  aside { position:sticky; top:16px; }
+  @media (max-width: 960px) { aside { position:static; } }
+  .tabs button { background:#fff; }
+  .tabs button[aria-pressed=true] { background:var(--ours); color:#fff; border-color:var(--ours); }
+  .pick { background:#fff; border:1px solid var(--line); }
+  .pick[aria-current=true] { border:2px solid var(--ours); background:var(--ours-soft); padding:3px; }
+  .inputs { align-items:center; gap:16px; min-height:84px; }
+  .inputs .cap { max-width:340px; text-wrap:pretty; }
+  .pane { border-color:var(--line); border-radius:16px; box-shadow:0 1px 2px rgba(23,20,31,.04), 0 12px 32px -12px rgba(112,72,200,.14); }
+  .pane-h { flex-wrap:nowrap; min-height:48px; padding:8px 12px; }
+  .pane-h .t { white-space:nowrap; }
+  .three .size { position:absolute; right:10px; bottom:8px; z-index:2; color:#cfcade; font-size:.72rem;
+                 background:rgba(18,17,24,.6); padding:3px 8px; border-radius:999px; }
+  .timeline { padding:0 2px; }
+  .legend, .note { padding:0 2px; }
+  .note { max-width:none; text-wrap:pretty; }
+  footer { border-top:1px solid var(--line); margin-top:10px; }
+  @media (max-width: 600px) { .hint { display:none; } }              /* leave the corner to the point-size control */
+  /* sample picker: one row above the viewer instead of a tall column beside it */
+  main:has(> aside.picker) { grid-template-columns:minmax(0, 1fr); gap:18px; }
+  aside.picker { position:static; display:flex; flex-direction:column; gap:10px; }
+  aside.picker .tabs { margin:0; }
+  aside.picker .picks { display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scroll-snap-type:x proximity; scrollbar-width:thin; }
+  aside.picker .pick { flex:0 0 200px; scroll-snap-align:start; }
+  @media (max-width: 600px) { aside.picker .pick { flex-basis:160px; } }
+  /* text: one column width everywhere, no single-word last lines */
+  .inputs { flex-wrap:nowrap; }
+  .inputs img { flex:0 0 auto; max-width:60%; }
+  .inputs .cap { flex:1 1 auto; max-width:none; font-size:.88rem; line-height:1.55; }
+  @media (max-width: 760px) { .inputs { flex-wrap:wrap; } .inputs img { max-width:100%; } }
+  .sub, .note, .legend span, .pick span, .inputs .cap { text-wrap:pretty; }
+  .legend { gap:8px 22px; }
+  .pick span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
@@ -78,7 +121,7 @@
 </header>
 
 <main>
-  <aside>
+  <aside class="picker">
     <div class="tabs" role="group" aria-label="domain">
       <button type="button" data-dom="Real" aria-pressed="true">Real</button>
       <button type="button" data-dom="Synthetic" aria-pressed="false">Synthetic</button>
@@ -113,9 +156,9 @@
             <button type="button" data-view="overview" aria-pressed="true">Overview</button>
             <button type="button" data-view="follow" aria-pressed="false">Ride along</button>
           </div>
-          <label class="size">points <input type="range" id="psize" min="1" max="10" value="4" aria-label="point size"></label>
         </div>
         <div class="three" id="three"><div class="loading" id="loading">loading&hellip;</div>
+          <label class="size">point size <input type="range" id="psize" min="1" max="10" value="4" aria-label="point size"></label>
           <div class="hint">drag to orbit &middot; scroll to zoom &middot; right-drag to pan</div></div>
       </div>
     </div>
