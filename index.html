@@ -263,13 +263,18 @@
   /* one column for every section: same width, same left edge */
   .section > .container { max-width:1120px !important; width:100%; }
   .abstract p { max-width:none; }
-  .narrow { max-width:780px; margin-left:0; margin-right:auto; }
+  .narrow { max-width:780px; margin-left:auto; margin-right:auto; }     /* narrow media: centred under the left-aligned text */
+  .narrow .tabs.is-centered ul { justify-content:center; }
   .pfig[style] { margin-left:0 !important; margin-right:auto !important; }
   .lead, .caption, .more-b .lead { max-width:none; }               /* text spans the same column as the figures and videos */
   .columns { margin-left:-.75rem; margin-right:-.75rem; }
   .groups { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.45rem 2rem; max-width:none; margin:.2rem 0 1.4rem;
             text-align:left; font-size:.9rem; line-height:1.45; }
   @media (max-width: 760px) { .groups { grid-template-columns:1fr; } }
+  .groups .fail { display:block; font-style:normal; font-size:.84rem; color:#8a849a; margin-top:.1rem; }
+  .groups .fail::before { content:'\2192\00a0'; color:#c3bdd3; }
+  .groups .ours-note { grid-column:1 / -1; color:var(--ours); }
+  .groups .ours-note b { color:var(--ours); }
   .vlabels span, .cmp-grid .ch, .cell-label, .wlab span { text-wrap:balance; }
   .vlabels span { display:flex; align-items:center; justify-content:center; line-height:1.3; }
   @media (max-width: 1280px) { .toc { background:rgba(251,250,255,.92); } }
@@ -382,7 +387,7 @@ and unseen real-world benchmarks demonstrate superior performance across evaluat
 <section class="section pt-0" id="baselines">
   <div class="container is-max-widescreen">
     <div class="eyebrow">Comparisons</div><h2 class="title is-4 section-title has-text-centered">Comparison with baselines</h2>
-    <div class="lead">All methods receive the same start observation and goal image; none receives the ground-truth trajectory. Right: camera paths seen from above, each anchored at the start camera and scaled to the ground-truth length.<div class="groups"><span><b>Joint</b> camera + video generation</span><span><b>Plan-then-generate</b> NoMaD path &rarr; world model</span><span><b>Pose-then-generate</b> VGGT-&Omega; start/goal poses, interpolated &rarr; novel-view model</span><span><b>Video only</b> first/last-frame video models</span></div></div>
+    <div class="lead">All methods receive the same start observation and goal image; none receives the ground-truth trajectory. Right: camera paths seen from above, each anchored at the start camera and scaled to the ground-truth length.<div class="groups"><span><b>Joint</b> camera + video generation<em class="fail">keeps existing structure but reveals few new regions (Aether)</em></span><span><b>Plan-then-generate</b> NoMaD path &rarr; world model<em class="fail">structural distortion and drift</em></span><span><b>Pose-then-generate</b> VGGT-&Omega; start/goal poses, interpolated &rarr; novel-view model<em class="fail">interpolated paths may cross unseen obstacles</em></span><span><b>Video only</b> first/last-frame video models<em class="fail">abrupt scene changes and appearance drift</em></span><span class="ours-note"><b>WAMderer</b> reveals new regions while preserving recognizable structure.</span></div></div>
     <div class="tabs is-toggle is-centered is-small rtabs"><ul><li class="is-active" data-tab="baselines-real"><a>Real world&nbsp;<small>(unseen recordings)</small></a></li><li class="" data-tab="baselines-syn"><a>Synthetic (CARLA)&nbsp;<small>(held-out town)</small></a></li></ul></div><div class="tabpane" data-pane="baselines-real"><div class="carousel" id="car-baselines-real" data-items='[{&quot;v&quot;: &quot;static/media/baselines/real01.mp4&quot;, &quot;p&quot;: &quot;static/media/baselines/real01.jpg&quot;, &quot;h&quot;: &quot;static/media/baselines/real01_hist.jpg&quot;, &quot;g&quot;: &quot;static/media/baselines/real01_goal.jpg&quot;}, {&quot;v&quot;: &quot;static/media/baselines/real02.mp4&quot;, &quot;p&quot;: &quot;static/media/baselines/real02.jpg&quot;, &quot;h&quot;: &quot;static/media/baselines/real02_hist.jpg&quot;, &quot;g&quot;: &quot;static/media/baselines/real02_goal.jpg&quot;}, {&quot;v&quot;: &quot;static/media/baselines/real03.mp4&quot;, &quot;p&quot;: &quot;static/media/baselines/real03.jpg&quot;, &quot;h&quot;: &quot;static/media/baselines/real03_hist.jpg&quot;, &quot;g&quot;: &quot;static/media/baselines/real03_goal.jpg&quot;}, {&quot;v&quot;: &quot;static/media/baselines/real04.mp4&quot;, &quot;p&quot;: &quot;static/media/baselines/real04.jpg&quot;, &quot;h&quot;: &quot;static/media/baselines/real04_hist.jpg&quot;, &quot;g&quot;: &quot;static/media/baselines/real04_goal.jpg&quot;}, {&quot;v&quot;: &quot;static/media/baselines/real05.mp4&quot;, &quot;p&quot;: &quot;static/media/baselines/real05.jpg&quot;, &quot;h&quot;: &quot;static/media/baselines/real05_hist.jpg&quot;, &quot;g&quot;: &quot;static/media/baselines/real05_goal.jpg&quot;}]'>
   <div class="vwrap solo" style="aspect-ratio:1416/768"><video class="car-vid" data-src="static/media/baselines/real01.mp4" poster="static/media/baselines/real01.jpg" muted loop playsinline preload="none"></video><div class="grid12"><div><span class="gt">Ground truth</span></div><div><span class="ours">WAMderer (Ours)</span></div><div><span class="">Aether</span></div><div><span class="">NoMaD + NWM</span></div><div><span class="">NoMaD + DeepVerse</span></div><div><span class="">NoMaD + LingBot-World</span></div><div><span class="">NoMaD + EgoWM</span></div><div><span class="">VGGT-Ω + SEVA</span></div><div><span class="">VGGT-Ω + VGGT-Diff</span></div><div><span class="">Wan2.1-FLF2V</span></div><div><span class="">Wan2.1-VACE</span></div><div><span class="">Wan2.2-Fun-InP</span></div></div></div>
   
@@ -407,7 +412,7 @@ and unseen real-world benchmarks demonstrate superior performance across evaluat
     </div>
   </div>
   <div class="thumbs"><button class="thumb is-current sq" data-k="0" aria-label="sample 1"><img src="static/media/baselines/syn01_goal.jpg" loading="lazy" alt=""><span class="thumb-n">1</span></button><button class="thumb sq" data-k="1" aria-label="sample 2"><img src="static/media/baselines/syn02_goal.jpg" loading="lazy" alt=""><span class="thumb-n">2</span></button><button class="thumb sq" data-k="2" aria-label="sample 3"><img src="static/media/baselines/syn03_goal.jpg" loading="lazy" alt=""><span class="thumb-n">3</span></button><button class="thumb sq" data-k="3" aria-label="sample 4"><img src="static/media/baselines/syn04_goal.jpg" loading="lazy" alt=""><span class="thumb-n">4</span></button><button class="thumb sq" data-k="4" aria-label="sample 5"><img src="static/media/baselines/syn05_goal.jpg" loading="lazy" alt=""><span class="thumb-n">5</span></button></div>
-</div></div><h4 class="title is-5 sub-title">Qualitative comparisons</h4><figure class="pfig" data-name="qual" data-pdf="static/figures/qual.pdf"><img class="figure-img" src="static/images/qual.png" alt="qual"><figcaption class="caption">Video-only methods show abrupt scene changes or appearance drift; pose-then-generate methods interpolate paths that may cross unseen obstacles; plan-then-generate methods show structural distortions and drift; Aether tends to keep existing structures without revealing new regions. WAMderer reveals new regions while preserving recognizable structure.</figcaption></figure>
+</div></div>
   </div>
 </section>
 <section class="section pt-0" id="coherence">
