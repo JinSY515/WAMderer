@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAMderer Explorer</title>
+<meta name="description" content="Explore WAMderer traversals: generated video, predicted depth and the predicted camera, lifted into 3D.">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ours:#7048c8; --ours-soft:#f0ebfb; --goal:#8e44ad; --ink:#222; --muted:#6b6b6b; --faint:#9a9a9a;
+          --line:#e5e5e5; --bg:#ffffff; --panel:#fafafa; --dark:#121118; }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }                 /* .pick / video display rules must not override hidden */
+  body { margin:0; font-family:'Google Sans','Noto Sans',sans-serif; color:var(--ink); background:var(--bg); }
+  a { color:var(--ours); text-decoration:none; } a:hover { text-decoration:underline; }
+  header { max-width:1280px; margin:0 auto; padding:22px 16px 6px; }
+  .back { font-size:.9rem; }
+  h1 { font-size:1.9rem; margin:.35rem 0 .2rem; } h1 .brand { color:var(--ours); }
+  .sub { color:var(--muted); margin:0 0 .4rem; max-width:860px; line-height:1.5; }
+  main { max-width:1280px; margin:0 auto; padding:8px 16px 40px; display:grid; grid-template-columns:260px 1fr; gap:22px; }
+  @media (max-width: 960px) { main { grid-template-columns:1fr; } }
+
+  /* picker */
+  .tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .tabs button { font:inherit; font-size:.85rem; padding:5px 14px; border-radius:999px; border:1px solid var(--line);
+                 background:#fff; color:var(--muted); cursor:pointer; }
+  .tabs button[aria-pressed=true] { background:var(--ours-soft); color:var(--ours); border-color:var(--ours); font-weight:600; }
+  .picks { display:grid; grid-template-columns:1fr; gap:8px; }
+  @media (max-width: 960px) { .picks { grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); } }
+  .pick { display:block; width:100%; padding:4px; border:2px solid transparent; border-radius:10px; background:var(--panel); cursor:pointer; text-align:left; font:inherit; }
+  .pick img { width:100%; display:block; border-radius:6px; }
+  .pick span { display:block; font-size:.75rem; color:var(--muted); padding:4px 2px 0; }
+  .pick[aria-current=true] { border-color:var(--ours); background:var(--ours-soft); }
+  .pick:hover { border-color:#c9b8f0; }
+
+  /* viewer */
+  .inputs { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .inputs img { height:84px; border-radius:6px; display:block; max-width:100%; object-fit:contain; }
+  .inputs .cap { font-size:.82rem; color:var(--muted); line-height:1.45; max-width:300px; }
+  .inputs .cap b { color:var(--ink); } .inputs .cap .g { color:var(--goal); font-weight:600; }
+  .panes { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.35fr); gap:14px; }
+  @media (max-width: 760px) { .panes { grid-template-columns:1fr; } }
+  .pane { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
+  .pane-h { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .pane-h .t { font-weight:600; font-size:.9rem; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { font:inherit; font-size:.78rem; padding:4px 10px; border:0; background:#fff; color:var(--muted); cursor:pointer; }
+  .seg button + button { border-left:1px solid var(--line); }
+  .seg button[aria-pressed=true] { background:var(--ours-soft); color:var(--ours); font-weight:600; }
+  .vid { position:relative; background:#000; aspect-ratio:1/1; }
+  .vid video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  .three { position:relative; background:var(--dark); flex:1; min-height:360px; }
+  .three canvas { display:block; width:100%; height:100%; cursor:grab; }
+  .three canvas:active { cursor:grabbing; }
+  .loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#cfcade; font-size:.9rem; }
+  .hint { position:absolute; left:10px; bottom:8px; font-size:.72rem; color:#a8a3b8; pointer-events:none; }
+  .size { display:flex; align-items:center; gap:6px; font-size:.75rem; color:var(--muted); }
+  .size input { width:80px; accent-color:var(--ours); }
+
+  .timeline { display:flex; align-items:center; gap:12px; margin-top:12px; }
+  .play { font:inherit; width:40px; height:40px; border-radius:50%; border:0; background:var(--ours); color:#fff; font-size:15px; cursor:pointer; flex:0 0 auto; }
+  .play:focus-visible, .tabs button:focus-visible, .pick:focus-visible, .seg button:focus-visible { outline:2px solid var(--ours); outline-offset:2px; }
+  .timeline input[type=range] { flex:1; accent-color:var(--ours); }
+  .fr { font-size:.82rem; color:var(--muted); min-width:96px; text-align:right; font-variant-numeric:tabular-nums; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); margin-top:10px; }
+  .legend i { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-right:6px; }
+  .note { font-size:.8rem; color:var(--faint); line-height:1.5; margin-top:10px; max-width:900px; }
+  footer { text-align:center; color:var(--faint); font-size:.8rem; padding:20px 16px 30px; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="./">&larr; WAMderer project page</a>
+  <h1>Explore <span class="brand">WAMderer</span> traversals</h1>
+  <p class="sub">Pick a start and a goal. WAMderer generates the video, its camera path and the scene depth together; here the
+    generated frames are lifted into 3D with <b>our own predicted depth and camera</b>, growing as the video plays.
+    Scrub the timeline, orbit the scene, or ride along with the camera.</p>
+</header>
+
+<main>
+  <aside>
+    <div class="tabs" role="group" aria-label="domain">
+      <button type="button" data-dom="Real" aria-pressed="true">Real</button>
+      <button type="button" data-dom="Synthetic" aria-pressed="false">Synthetic</button>
+      <button type="button" data-dom="Long" aria-pressed="false">Long · real</button>
+      <button type="button" data-dom="LongSyn" aria-pressed="false">Long · synthetic</button>
+    </div>
+    <div class="picks" id="picks"></div>
+  </aside>
+
+  <section>
+    <div class="inputs">
+      <img id="inputs" alt="inputs: history frames and the goal image">
+      <div class="cap" id="incap"><b>Inputs</b>: four history frames and the <span class="g">goal image</span> (purple). No camera
+        trajectory is given.</div>
+    </div>
+    <div class="panes">
+      <div class="pane">
+        <div class="pane-h"><span class="t">Generated</span>
+          <div class="seg" role="group" aria-label="video layer">
+            <button type="button" data-layer="rgb" aria-pressed="true">Video</button>
+            <button type="button" data-layer="depth" aria-pressed="false">Predicted depth</button>
+          </div>
+        </div>
+        <div class="vid">
+          <video id="v-rgb" muted playsinline preload="auto"></video>
+          <video id="v-depth" muted playsinline preload="auto" hidden></video>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-h"><span class="t">Lifted to 3D</span>
+          <div class="seg" role="group" aria-label="3D view">
+            <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+            <button type="button" data-view="follow" aria-pressed="false">Ride along</button>
+          </div>
+          <label class="size">points <input type="range" id="psize" min="1" max="10" value="4" aria-label="point size"></label>
+        </div>
+        <div class="three" id="three"><div class="loading" id="loading">loading&hellip;</div>
+          <div class="hint">drag to orbit &middot; scroll to zoom &middot; right-drag to pan</div></div>
+      </div>
+    </div>
+    <div class="timeline">
+      <button type="button" class="play" id="play" aria-label="play / pause">&#9654;</button>
+      <input type="range" id="t" min="0" max="76" value="0" aria-label="frame">
+      <span class="fr" id="fr">frame 0 / 76</span>
+      <span class="fr" id="seg" hidden></span>
+    </div>
+    <div class="legend">
+      <span><i style="background:#c9a8ff"></i>our predicted camera path</span>
+      <span><i style="background:#ffffff"></i>current camera</span>
+      <span><i style="background:linear-gradient(90deg,#6e8,#59c,#c6a)"></i>points: our predicted depth, coloured by the generated frame</span>
+    </div>
+    <p class="note">How the 3D view is made: every 4th generated frame is lifted with the depth predicted by WAMderer's
+      auxiliary depth head and placed with WAMderer's own predicted camera. The depth head predicts relative depth, so its
+      scale and shift are set once per traversal by Depth Anything 3 run on the same generated video; no ground truth is
+      used. Results are precomputed.</p>
+  </section>
+</main>
+<footer>WAMderer &middot; interactive explorer of precomputed results</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const vR = $("v-rgb"), vD = $("v-depth"), slider = $("t"), fr = $("fr"), playBtn = $("play");
+let INDEX = null, cur = null, data = null, loadSeq = 0, view = "overview", layer = "rgb";
+
+// ---------- three.js scene
+const host = $("three");
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+host.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x121118);
+const camera = new THREE.PerspectiveCamera(55, 1, 0.05, 500);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.addEventListener("start", () => { if (view === "follow") setView("overview", false); });
+let points = null, pathAll = null, pathDone = null, frustum = null, startDot = null;
+const mat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, sizeAttenuation: true });
+
+function resize() {
+  const w = host.clientWidth, h = Math.max(360, host.clientHeight);
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(host);
+
+function clearScene() {
+  for (const o of [points, pathAll, pathDone, frustum, startDot]) if (o) { scene.remove(o); o.geometry && o.geometry.dispose(); }
+  points = pathAll = pathDone = frustum = startDot = null;
+}
+
+function parse(buf) {
+  const L = new DataView(buf).getUint32(0, true);
+  const head = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, L)));
+  const n = head.n; let o = 4 + L;
+  const pos = new Int16Array(buf, o, n * 3); o += n * 6 + ((4 - (n * 6) % 4) % 4);
+  const col = new Uint8Array(buf, o, n * 3); o += n * 3 + ((4 - (n * 3) % 4) % 4);
+  const key = new Uint8Array(buf, o, n);
+  return { head, pos, col, key };
+}
+
+function build(d) {
+  clearScene();
+  const n = d.head.n, P = new Float32Array(n * 3), C = new Float32Array(n * 3);
+  for (let i = 0; i < n * 3; i++) { P[i] = d.pos[i] / 100; C[i] = d.col[i] / 255; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(P, 3)); g.setAttribute("color", new THREE.BufferAttribute(C, 3));
+  points = new THREE.Points(g, mat); scene.add(points);
+  d.cum = []; let s = 0; for (const c of d.head.counts) { s += c; d.cum.push(s); }
+  const pts = d.head.path.map(p => new THREE.Vector3(...p));
+  pathAll = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+                           new THREE.LineBasicMaterial({ color: 0x8a76c4, transparent: true, opacity: 0.35 }));
+  pathDone = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xc9a8ff }));
+  scene.add(pathAll); scene.add(pathDone);
+  frustum = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffffff }));
+  frustum.geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(16 * 3), 3)); scene.add(frustum);
+  startDot = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 8), new THREE.MeshBasicMaterial({ color: 0xc9a8ff }));
+  startDot.position.copy(pts[0]); scene.add(startDot);
+  // overview framing: behind and above the start, looking along the path
+  const box = new THREE.Box3().setFromBufferAttribute(g.attributes.position), size = box.getSize(new THREE.Vector3());
+  d.ctr = box.getCenter(new THREE.Vector3()).lerp(pts[Math.floor(pts.length / 2)], 0.5);
+  d.radius = Math.max(4, Math.min(60, 0.6 * Math.max(size.x, size.z)));
+}
+
+function camAt(f) {
+  const H = data.head, p = new THREE.Vector3(...H.path[f]), fw = new THREE.Vector3(...H.fwd[f]).normalize(),
+        up = new THREE.Vector3(...H.up[f]).normalize();
+  return { p, fw, up };
+}
+
+function overview() {
+  const { p, fw } = camAt(0), flat = new THREE.Vector3(fw.x, 0, fw.z).normalize();
+  controls.target.copy(data.ctr);
+  camera.position.copy(data.ctr).addScaledVector(flat, -data.radius * 1.1).add(new THREE.Vector3(0, data.radius * 0.9, 0));
+  camera.up.set(0, 1, 0); controls.update();
+}
+
+const lastF = () => (data ? data.head.frames : 77) - 1;
+function setFrame(f) {
+  if (!data) return;
+  f = Math.max(0, Math.min(lastF(), f));
+  const k = Math.min(data.head.counts.length - 1, Math.floor(f / 4));
+  points.geometry.setDrawRange(0, data.cum[k]);
+  pathDone.geometry.setDrawRange(0, f + 1);
+  const { p, fw, up } = camAt(f), right = new THREE.Vector3().crossVectors(fw, up).normalize();
+  const L = 0.45, w = 0.3, h = 0.3, c = p.clone().addScaledVector(fw, L);
+  const q = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([a, b]) => c.clone().addScaledVector(right, a * w).addScaledVector(up, b * h));
+  const segs = [p, q[0], p, q[1], p, q[2], p, q[3], q[0], q[1], q[1], q[2], q[2], q[3], q[3], q[0]];
+  const arr = frustum.geometry.attributes.position.array; segs.forEach((v, i) => { arr[3 * i] = v.x; arr[3 * i + 1] = v.y; arr[3 * i + 2] = v.z; });
+  frustum.geometry.attributes.position.needsUpdate = true; frustum.geometry.computeBoundingSphere();
+  if (view === "follow") {
+    camera.position.copy(p).addScaledVector(fw, -1.6).addScaledVector(up, 0.7);
+    camera.up.copy(up); controls.target.copy(p).addScaledVector(fw, 3); controls.update();
+  }
+  slider.value = f; fr.textContent = `frame ${f} / ${lastF()}`;
+  if (data.head.frames > 77) { const sg = $("seg"); sg.hidden = false; sg.textContent = `segment ${Math.min(4, 1 + Math.floor(f / 76))} / 4`; }
+  else $("seg").hidden = true;
+}
+
+// ---------- video sync (the RGB video is the clock)
+const FPS = 16, frameOf = t => Math.min(lastF(), Math.floor(t * FPS + 1e-3));
+function seek(f) { const t = (f + 0.5) / FPS; vR.currentTime = t; vD.currentTime = t; setFrame(f); }
+function togglePlay(force) {
+  const go = force !== undefined ? force : vR.paused;
+  if (go) { if (frameOf(vR.currentTime) >= lastF()) seek(0); vR.play().catch(() => {}); vD.play().catch(() => {}); }
+  else { vR.pause(); vD.pause(); }
+  playBtn.innerHTML = go ? "&#10074;&#10074;" : "&#9654;";
+}
+playBtn.addEventListener("click", () => togglePlay());
+slider.addEventListener("input", () => { togglePlay(false); seek(+slider.value); });
+vR.addEventListener("ended", () => { playBtn.innerHTML = "&#9654;"; });
+function tick() {
+  if (data && !vR.paused) {
+    if (Math.abs(vD.currentTime - vR.currentTime) > 0.08) vD.currentTime = vR.currentTime;
+    setFrame(frameOf(vR.currentTime));
+  }
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(tick);
+}
+
+// ---------- controls
+function setView(v, apply = true) {
+  view = v; document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
+  controls.enabled = true;
+  if (apply && data) { if (v === "overview") overview(); setFrame(+slider.value); }
+}
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+document.querySelectorAll("[data-layer]").forEach(b => b.addEventListener("click", () => {
+  layer = b.dataset.layer; document.querySelectorAll("[data-layer]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  vR.style.visibility = layer === "rgb" ? "visible" : "hidden"; vD.hidden = layer !== "depth";
+}));
+$("psize").addEventListener("input", e => { mat.size = 0.01 * +e.target.value; });
+
+// ---------- samples
+async function select(s) {
+  const my = ++loadSeq; cur = s;
+  document.querySelectorAll(".pick").forEach(b => b.setAttribute("aria-current", b.dataset.id === s.id));
+  $("inputs").src = `demo/media/${s.id}_in.jpg`;
+  togglePlay(false);
+  vR.src = `demo/media/${s.id}.mp4`; vR.poster = `demo/media/${s.id}.jpg`;
+  vD.src = `demo/media/${s.id}_depth.mp4`;
+  $("loading").hidden = false; $("loading").textContent = "loading the 3D scene…";
+  try {
+    const r = await fetch(`demo/data/${s.id}.bin`); if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = parse(await r.arrayBuffer()); if (my !== loadSeq) return;
+    data = d; slider.max = d.head.frames - 1; build(d); resize(); setView(view); seek(0);
+    $("incap").innerHTML = d.head.frames > 77
+      ? '<b>Inputs</b>: the start view and the <span class="g">goal of each of the 4 segments</span> (purple). Each segment starts from the last generated frame of the previous one; no camera trajectory is given.' + (s.dom === "LongSyn" ? ' Held-out CARLA routes.' : '')
+      : '<b>Inputs</b>: four history frames and the <span class="g">goal image</span> (purple). No camera trajectory is given.';
+    $("loading").hidden = true; history.replaceState(null, "", "#" + s.id);
+    togglePlay(true);
+  } catch (e) { $("loading").textContent = "could not load this scene: " + e.message; }
+}
+
+const DLBL = { Long: "Long · real", LongSyn: "Long · synthetic" };
+function showDom(dom) {
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.dom === dom));
+  document.querySelectorAll(".pick").forEach(b => { b.hidden = b.dataset.dom !== dom; });
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  showDom(b.dataset.dom); const first = INDEX.samples.find(s => s.dom === b.dataset.dom); if (first) select(first);
+}));
+
+fetch("demo/samples.json").then(r => r.json()).then(ix => {
+  INDEX = ix; const box = $("picks");
+  const nth = {};
+  ix.samples.forEach(s => {
+    const j = nth[s.dom] = (nth[s.dom] || 0) + 1;                     // numbered within its own domain
+    const b = document.createElement("button"); b.type = "button"; b.className = "pick"; b.dataset.id = s.id; b.dataset.dom = s.dom;
+    b.innerHTML = `<img src="demo/media/${s.id}_thumb.jpg" alt="start view and goal image" loading="lazy"><span>${DLBL[s.dom] || s.dom} · scene ${j}</span>`;
+    b.addEventListener("click", () => select(s)); box.appendChild(b);
+  });
+  const want = ix.samples.find(s => "#" + s.id === location.hash) || ix.samples.find(s => s.dom === "Real") || ix.samples[0];
+  showDom(want.dom); select(want);
+}).catch(e => { $("loading").textContent = "samples.json missing: " + e.message; });
+
+resize(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
